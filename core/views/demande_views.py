@@ -157,14 +157,28 @@ def traiter_reponse(request, reponse_id, action):
         pk=reponse_id,
         demande__hopital=hopital
     )
+    demande = reponse.demande
 
     if action == 'confirmer':
         reponse.statut = 'confirme'
         reponse.save()
+
+        # ✅ Clôturer automatiquement la demande après confirmation
+        demande.statut = 'satisfaite'
+        demande.save()
+
+        # Annuler toutes les autres réponses en attente
+        ReponseAppel.objects.filter(
+            demande=demande,
+            statut='en_attente'
+        ).exclude(pk=reponse.pk).update(statut='annule')
+
         messages.success(
             request,
-            f"Réponse de {reponse.donneur.user.get_full_name()} confirmée."
+            f"Réponse de {reponse.donneur.user.get_full_name()} confirmée. La demande est maintenant clôturée."
         )
+        return redirect('dashboard_hopital')
+
     elif action == 'annuler':
         reponse.statut = 'annule'
         reponse.save()
@@ -172,5 +186,6 @@ def traiter_reponse(request, reponse_id, action):
             request,
             f"Réponse de {reponse.donneur.user.get_full_name()} annulée."
         )
+        return redirect('gerer_reponses', pk=demande.pk)
 
-    return redirect('gerer_reponses', pk=reponse.demande.pk)
+    return redirect('dashboard_hopital')
