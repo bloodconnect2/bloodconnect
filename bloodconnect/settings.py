@@ -14,8 +14,7 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com"]
-
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".railway.app"]
 # =========================
 # APPS
 # =========================
