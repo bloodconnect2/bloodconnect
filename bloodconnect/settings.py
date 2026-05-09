@@ -9,20 +9,18 @@ SECRET_KEY = os.environ.get(
     "django-insecure-change-this-in-production"
 )
 
-DEBUG = True  # temporairement pour voir l'erreur
+DEBUG = False
 
-ALLOWED_HOSTS = ["*"]  # temporairement
+ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.railway.app",
     "https://bloodconnect-production-001e.up.railway.app",
 ]
 
-# Ajoute ces deux lignes importantes
-CSRF_COOKIE_SAMESITE = 'None'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'None'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
