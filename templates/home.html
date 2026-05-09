@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Accueil — BloodConnect{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="p-5 mb-4 bg-danger text-white rounded-3">
+  <div class="container-fluid py-3">
+    <h1 class="display-5 fw-bold"><i class="bi bi-droplet-fill"></i> BloodConnect</h1>
+    <p class="col-md-8 fs-5">Connectez les donneurs de sang aux hôpitaux qui en ont besoin. Chaque don compte.</p>
+    {% if not user.is_authenticated %}
+      <a href="{% url 'inscription_donneur' %}" class="btn btn-light btn-lg me-2">Devenir donneur</a>
+      <a href="{% url 'inscription_hopital' %}" class="btn btn-outline-light btn-lg">Inscrire un hôpital</a>
+    {% else %}
+      <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg">Mon tableau de bord</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Demandes urgentes -->
+<h3 class="mb-3"><i class="bi bi-exclamation-circle-fill text-danger"></i> Demandes urgentes actives</h3>
+<div class="row g-3 mb-5">
+  {% for demande in demandes_recentes %}
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <span class="badge bg-danger fs-5 mb-2">{{ demande.groupe_sanguin }}</span>
+          <h6 class="card-title">{{ demande.hopital.nom }}</h6>
+          <p class="text-muted small"><i class="bi bi-geo-alt"></i> {{ demande.hopital.ville }}</p>
+          <p class="small">{{ demande.quantite }} poche(s) — avant le {{ demande.delai }}</p>
+          <a href="{% url 'detail_demande' demande.pk %}" class="btn btn-outline-danger btn-sm">Voir</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">Aucune demande urgente active pour le moment.</p>
+  {% endfor %}
+</div>
+
+<!-- Campagnes -->
+<h3 class="mb-3"><i class="bi bi-calendar-event text-primary"></i> Prochaines campagnes</h3>
+<div class="row g-3">
+  {% for campagne in campagnes_a_venir %}
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">{{ campagne.nom }}</h6>
+          <p class="text-muted small"><i class="bi bi-calendar"></i> {{ campagne.date }} — <i class="bi bi-geo-alt"></i> {{ campagne.lieu }}</p>
+          <p class="small">Places restantes : <strong>{{ campagne.places_restantes }}</strong></p>
+          <a href="{% url 'detail_campagne' campagne.pk %}" class="btn btn-outline-primary btn-sm">Détails</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">Aucune campagne à venir.</p>
+  {% endfor %}
+</div>
+{% endblock %}

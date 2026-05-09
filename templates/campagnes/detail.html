@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ campagne.nom }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card p-4 mb-4">
+      <h4>{{ campagne.nom }}</h4>
+      <p class="text-muted">
+        <i class="bi bi-hospital"></i> {{ campagne.hopital.nom }} &nbsp;|&nbsp;
+        <i class="bi bi-calendar"></i> {{ campagne.date }} &nbsp;|&nbsp;
+        <i class="bi bi-geo-alt"></i> {{ campagne.lieu }}
+      </p>
+      <p>
+        Groupes ciblés :
+        {% for g in campagne.groupes_cibles %}
+          <span class="badge bg-danger">{{ g }}</span>
+        {% endfor %}
+      </p>
+      <p>Capacité : <strong>{{ places_restantes }}</strong> places restantes sur {{ campagne.capacite_totale }}</p>
+
+      {% if user.is_authenticated and est_donneur %}
+        {% if deja_inscrit %}
+          <div class="alert alert-success"><i class="bi bi-check-circle"></i> Vous êtes inscrit à cette campagne.</div>
+        {% elif places_restantes > 0 %}
+          <a href="{% url 'inscrire_campagne' campagne.pk %}" class="btn btn-primary">
+            <i class="bi bi-calendar-check"></i> S'inscrire
+          </a>
+        {% else %}
+          <div class="alert alert-warning">Cette campagne est complète.</div>
+        {% endif %}
+      {% elif not user.is_authenticated %}
+        <a href="{% url 'login' %}" class="btn btn-outline-primary">Connectez-vous pour s'inscrire</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6><i class="bi bi-people-fill"></i> Inscrits ({{ inscriptions.count }})</h6>
+      <ul class="list-group list-group-flush mt-2">
+        {% for ins in inscriptions %}
+          <li class="list-group-item d-flex justify-content-between">
+            {{ ins.donneur.user.get_full_name }}
+            <small class="text-muted">{{ ins.creneau_horaire }}</small>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">Aucune inscription.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

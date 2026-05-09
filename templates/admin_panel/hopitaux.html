@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Gestion des hôpitaux{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-hospital text-primary"></i> Gestion des hôpitaux</h3>
+
+<table class="table table-hover bg-white rounded shadow-sm">
+  <thead class="table-primary">
+    <tr>
+      <th>Nom</th><th>Ville</th><th>Agrément</th><th>Statut</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for h in hopitaux %}
+      <tr>
+        <td>{{ h.nom }}</td>
+        <td>{{ h.ville }}</td>
+        <td>{{ h.numero_agrement }}</td>
+        <td>
+          {% if h.valide %}
+            <span class="badge bg-success">Validé</span>
+          {% else %}
+            <span class="badge bg-warning text-dark">En attente</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if not h.valide %}
+            <a href="{% url 'valider_hopital' h.pk %}" class="btn btn-sm btn-success">Valider</a>
+          {% else %}
+            <span class="text-muted small">—</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-center text-muted">Aucun hôpital enregistré.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a href="{% url 'tableau_admin' %}" class="btn btn-outline-secondary mt-3">
+  <i class="bi bi-arrow-left"></i> Retour
+</a>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Modifier mon profil{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card p-4">
+      <h4 class="mb-4"><i class="bi bi-person-gear text-danger"></i> Modifier mon profil</h4>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {% if field.field.widget.input_type == 'select' %}
+              <select name="{{ field.html_name }}" class="form-select">
+                {% for val, label in field.field.choices %}
+                  <option value="{{ val }}" {% if field.value == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            {% else %}
+              <input type="{{ field.field.widget.input_type }}"
+                     name="{{ field.html_name }}"
+                     class="form-control {% if field.errors %}is-invalid{% endif %}"
+                     value="{{ field.value|default:'' }}">
+            {% endif %}
+            {% for error in field.errors %}
+              <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-danger w-100">Sauvegarder</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

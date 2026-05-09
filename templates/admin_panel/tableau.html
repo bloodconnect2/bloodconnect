@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Tableau de bord Admin{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-speedometer2 text-danger"></i> Tableau de bord Administrateur</h3>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card text-center p-3 border-danger">
+      <h6>Donneurs</h6>
+      <span class="fs-2 fw-bold text-danger">{{ total_donneurs }}</span>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center p-3 border-success">
+      <h6>Dons validés</h6>
+      <span class="fs-2 fw-bold text-success">{{ total_dons }}</span>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center p-3 border-primary">
+      <h6>Hôpitaux validés</h6>
+      <span class="fs-2 fw-bold text-primary">{{ total_hopitaux }}</span>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center p-3 border-warning">
+      <h6>En attente validation</h6>
+      <span class="fs-2 fw-bold text-warning">{{ hopitaux_en_attente }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card p-3 text-center">
+      <h6>Demandes actives</h6>
+      <span class="fs-3 fw-bold text-danger">{{ demandes_actives }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+  <a href="{% url 'liste_hopitaux' %}" class="btn btn-outline-primary"><i class="bi bi-hospital"></i> Gérer les hôpitaux</a>
+  <a href="{% url 'statistiques' %}" class="btn btn-outline-danger"><i class="bi bi-bar-chart"></i> Statistiques</a>
+  <a href="{% url 'export_donneurs_csv' %}" class="btn btn-outline-success"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Tableau de bord Donneur{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Bonjour, {{ request.user.first_name }} <i class="bi bi-heart-fill text-danger"></i></h2>
+
+<!-- Statut éligibilité -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card text-center p-3 {% if eligible %}border-success{% else %}border-warning{% endif %}">
+      <h6>Statut don</h6>
+      {% if eligible %}
+        <span class="badge bg-success fs-6">Éligible</span>
+      {% else %}
+        <span class="badge bg-warning text-dark fs-6">Prochain don : {{ prochain_don }}</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center p-3">
+      <h6>Groupe sanguin</h6>
+      <span class="badge bg-danger fs-4">{{ donneur.groupe_sanguin }}</span>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center p-3">
+      <h6>Total dons</h6>
+      <span class="fs-3 fw-bold text-danger">{{ total_dons }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Actions rapides -->
+<div class="mb-4">
+  <a href="{% url 'enregistrer_don' %}" class="btn btn-danger me-2"><i class="bi bi-plus-circle"></i> Enregistrer un don</a>
+  <a href="{% url 'historique_dons' %}" class="btn btn-outline-secondary me-2"><i class="bi bi-clock-history"></i> Historique</a>
+  <a href="{% url 'modifier_profil' %}" class="btn btn-outline-secondary"><i class="bi bi-person-gear"></i> Mon profil</a>
+</div>
+
+<!-- Demandes compatibles -->
+<h5 class="mb-3"><i class="bi bi-exclamation-circle text-danger"></i> Demandes compatibles avec votre groupe</h5>
+<div class="row g-3 mb-4">
+  {% for demande in demandes %}
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <span class="badge bg-danger">{{ demande.groupe_sanguin }}</span>
+          <h6 class="mt-2">{{ demande.hopital.nom }}</h6>
+          <p class="small text-muted">{{ demande.quantite }} poche(s) — {{ demande.delai }}</p>
+          <a href="{% url 'detail_demande' demande.pk %}" class="btn btn-sm btn-outline-danger">Répondre</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">Aucune demande compatible pour le moment.</p>
+  {% endfor %}
+</div>
+
+<!-- Campagnes -->
+<h5 class="mb-3"><i class="bi bi-calendar-check text-primary"></i> Campagnes à venir pour votre groupe</h5>
+<div class="row g-3">
+  {% for campagne in campagnes %}
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h6>{{ campagne.nom }}</h6>
+          <p class="small text-muted">{{ campagne.date }} — {{ campagne.lieu }}</p>
+          <a href="{% url 'detail_campagne' campagne.pk %}" class="btn btn-sm btn-outline-primary">S'inscrire</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">Aucune campagne prévue.</p>
+  {% endfor %}
+</div>
+{% endblock %}
