@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Détail demande{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <span class="badge bg-danger fs-3 mb-2">{{ demande.groupe_sanguin }}</span>
+          <h4>{{ demande.hopital.nom }}</h4>
+          <p class="text-muted"><i class="bi bi-geo-alt"></i> {{ demande.hopital.ville }}</p>
+        </div>
+        <span class="badge bg-{% if demande.statut == 'active' %}success{% else %}secondary{% endif %} fs-6">
+          {{ demande.get_statut_display }}
+        </span>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-6">
+          <p><strong>Quantité :</strong> {{ demande.quantite }} poche(s)</p>
+        </div>
+        <div class="col-6">
+          <p><strong>Date limite :</strong> {{ demande.delai }}</p>
+        </div>
+      </div>
+      {% if demande.description %}
+        <p><strong>Description :</strong> {{ demande.description }}</p>
+      {% endif %}
+
+      {% if user.is_authenticated and est_donneur %}
+        {% if deja_repondu %}
+          <div class="alert alert-success"><i class="bi bi-check-circle"></i> Vous avez déjà répondu à cette demande.</div>
+        {% elif demande.statut == 'active' %}
+          <a href="{% url 'repondre_demande' demande.pk %}" class="btn btn-danger">
+            <i class="bi bi-heart-fill"></i> Je veux donner
+          </a>
+        {% endif %}
+      {% elif not user.is_authenticated %}
+        <a href="{% url 'login' %}" class="btn btn-outline-danger">Connectez-vous pour répondre</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6><i class="bi bi-people-fill"></i> Donneurs ayant répondu ({{ reponses.count }})</h6>
+      <ul class="list-group list-group-flush mt-2">
+        {% for r in reponses %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ r.donneur.user.get_full_name }}
+            <span class="badge bg-{% if r.statut == 'confirme' %}success{% elif r.statut == 'annule' %}danger{% else %}warning text-dark{% endif %}">
+              {{ r.get_statut_display }}
+            </span>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">Aucune réponse pour l'instant.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

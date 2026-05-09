@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Enregistrer un don{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+
+    {% if prochain_don %}
+      <div class="alert alert-info mb-3">
+        <i class="bi bi-info-circle"></i>
+        Prochain don autorisé : <strong>{{ prochain_don }}</strong>
+        (délai de {{ donneur.get_delai_don }} jours).
+      </div>
+    {% endif %}
+
+    <div class="card p-4">
+      <h4 class="mb-4"><i class="bi bi-droplet-fill text-danger"></i> Enregistrer un don</h4>
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- Hôpital -->
+        <div class="mb-3">
+          <label class="form-label">Hôpital</label>
+          <select name="hopital" class="form-select {% if form.hopital.errors %}is-invalid{% endif %}">
+            <option value="">-- Choisir un hôpital --</option>
+            {% for val, label in form.hopital.field.choices %}
+              {% if val %}
+                <option value="{{ val }}"
+                  {% if form.hopital.value|stringformat:'s' == val|stringformat:'s' %}selected{% endif %}>
+                  {{ label }}
+                </option>
+              {% endif %}
+            {% endfor %}
+          </select>
+          {% for error in form.hopital.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- Date — min et max = aujourd'hui uniquement -->
+        <div class="mb-3">
+          <label class="form-label">Date du don</label>
+          <input type="date"
+                 name="date_don"
+                 class="form-control {% if form.date_don.errors %}is-invalid{% endif %}"
+                 value="{{ today }}"
+                 min="{{ today }}"
+                 max="{{ today }}">
+          {% for error in form.date_don.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+          <div class="form-text text-muted">Seule la date d'aujourd'hui est acceptée.</div>
+        </div>
+
+        <!-- Notes -->
+        <div class="mb-3">
+          <label class="form-label">Notes <span class="text-muted small">(optionnel)</span></label>
+          <textarea name="notes" rows="3"
+                    class="form-control">{{ form.notes.value|default:'' }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-danger w-100">
+          <i class="bi bi-check-circle"></i> Enregistrer
+        </button>
+        <a href="{% url 'dashboard_donneur' %}" class="btn btn-outline-secondary w-100 mt-2">Annuler</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

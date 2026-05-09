@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Tableau de bord Hôpital{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">{{ hopital.nom }} <i class="bi bi-hospital text-danger"></i></h2>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card text-center p-3">
+      <h6>Demandes actives</h6>
+      <span class="fs-3 fw-bold text-danger">{{ demandes_actives.count }}</span>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center p-3">
+      <h6>Campagnes à venir</h6>
+      <span class="fs-3 fw-bold text-primary">{{ campagnes.count }}</span>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center p-3">
+      <h6>Total dons reçus</h6>
+      <span class="fs-3 fw-bold text-success">{{ total_dons }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="mb-4">
+  <a href="{% url 'creer_demande' %}" class="btn btn-danger me-2"><i class="bi bi-plus-circle"></i> Nouvelle demande urgente</a>
+  <a href="{% url 'creer_campagne' %}" class="btn btn-outline-primary"><i class="bi bi-calendar-plus"></i> Créer une campagne</a>
+</div>
+
+<h5 class="mb-3">Demandes urgentes actives</h5>
+<table class="table table-hover bg-white rounded">
+  <thead class="table-danger">
+    <tr><th>Groupe</th><th>Quantité</th><th>Délai</th><th>Statut</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for d in demandes_actives %}
+      <tr>
+        <td><span class="badge bg-danger">{{ d.groupe_sanguin }}</span></td>
+        <td>{{ d.quantite }} poches</td>
+        <td>{{ d.delai }}</td>
+        <td><span class="badge bg-success">{{ d.statut }}</span></td>
+<td>
+  <a href="{% url 'modifier_demande' d.pk %}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+  <a href="{% url 'cloturer_demande' d.pk %}" class="btn btn-sm btn-outline-danger">Clôturer</a>
+  <a href="{% url 'gerer_reponses' d.pk %}" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-people"></i> Réponses
+    {% with count=d.reponses.filter.count %}{% endwith %}
+  </a>
+</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-muted text-center">Aucune demande active.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

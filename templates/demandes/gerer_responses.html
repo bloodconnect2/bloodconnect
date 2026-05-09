@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Gérer les réponses{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3><i class="bi bi-people-fill text-danger"></i> Réponses à la demande — {{ demande.groupe_sanguin }}</h3>
+  <a href="{% url 'dashboard_hopital' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i> Retour
+  </a>
+</div>
+
+<div class="card mb-3 p-3">
+  <div class="row">
+    <div class="col-md-3">
+      <span class="badge bg-danger fs-5">{{ demande.groupe_sanguin }}</span>
+    </div>
+    <div class="col-md-3">
+      <small class="text-muted">Quantité</small>
+      <p class="mb-0 fw-bold">{{ demande.quantite }} poche(s)</p>
+    </div>
+    <div class="col-md-3">
+      <small class="text-muted">Date limite</small>
+      <p class="mb-0 fw-bold">{{ demande.delai }}</p>
+    </div>
+    <div class="col-md-3">
+      <small class="text-muted">Réponses reçues</small>
+      <p class="mb-0 fw-bold">{{ reponses.count }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-danger">
+        <tr>
+          <th>Donneur</th>
+          <th>Groupe sanguin</th>
+          <th>Ville</th>
+          <th>Date réponse</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reponses %}
+          <tr>
+            <td>
+              <strong>{{ r.donneur.user.get_full_name }}</strong><br>
+              <small class="text-muted">{{ r.donneur.user.email }}</small>
+            </td>
+            <td><span class="badge bg-danger">{{ r.donneur.groupe_sanguin }}</span></td>
+            <td>{{ r.donneur.ville }}</td>
+            <td>{{ r.date_reponse|date:"d/m/Y H:i" }}</td>
+            <td>
+              {% if r.statut == 'en_attente' %}
+                <span class="badge bg-warning text-dark">En attente</span>
+              {% elif r.statut == 'confirme' %}
+                <span class="badge bg-success">Confirmé</span>
+              {% else %}
+                <span class="badge bg-danger">Annulé</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.statut == 'en_attente' %}
+                <a href="{% url 'traiter_reponse' r.pk 'confirmer' %}"
+                   class="btn btn-sm btn-success me-1"
+                   onclick="return confirm('Confirmer ce donneur ?')">
+                  <i class="bi bi-check-circle"></i> Confirmer
+                </a>
+                <a href="{% url 'traiter_reponse' r.pk 'annuler' %}"
+                   class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Annuler ce donneur ?')">
+                  <i class="bi bi-x-circle"></i> Annuler
+                </a>
+              {% else %}
+                <span class="text-muted small">Traité</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+              Aucun donneur n'a encore répondu à cette demande.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
