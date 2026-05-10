@@ -12,13 +12,11 @@ def enregistrer_don(request):
     donneur = request.user.donneur
     today = timezone.now().date()
 
-    # Bloquer si non éligible
     if not donneur.est_eligible():
         prochain = donneur.get_prochain_don()
-        messages.error(
-            request,
-            f"Vous ne pouvez pas enregistrer un don avant le {prochain}. "
-            f"Délai minimum : {donneur.get_delai_don()} jours."
+        messages.error(request,
+            f"Vous ne pouvez pas donner avant le {prochain}. "
+            f"Délai : {donneur.get_delai_don()} jours."
         )
         return redirect('historique_dons')
 
@@ -27,34 +25,30 @@ def enregistrer_don(request):
     if request.method == 'POST' and form.is_valid():
         date_don = form.cleaned_data['date_don']
 
-        # ✅ Contrôle 1 : date ne peut pas être dans le passé
         if date_don < today:
-            form.add_error('date_don', f"La date du don ne peut pas être avant aujourd'hui ({today}).")
+            form.add_error('date_don', f"La date ne peut pas être avant aujourd'hui ({today}).")
             return render(request, 'dons/enregistrer.html', {
-                'form': form,
-                'donneur': donneur,
-                'today': today,
+                'form': form, 'donneur': donneur, 'today': today,
+                'prochain_don': donneur.get_prochain_don(),
             })
 
-        # ✅ Contrôle 2 : date ne peut pas être dans le futur
         if date_don > today:
-            form.add_error('date_don', "La date du don ne peut pas être dans le futur.")
+            form.add_error('date_don', "La date ne peut pas être dans le futur.")
             return render(request, 'dons/enregistrer.html', {
-                'form': form,
-                'donneur': donneur,
-                'today': today,
+                'form': form, 'donneur': donneur, 'today': today,
+                'prochain_don': donneur.get_prochain_don(),
             })
 
-        # ✅ Contrôle 3 : respect du délai entre deux dons
         dernier_don = donneur.dons.filter(valide=True).order_by('-date_don').first()
         if dernier_don:
             date_minimale = dernier_don.date_don + timedelta(days=donneur.get_delai_don())
             if date_don < date_minimale:
-                form.add_error('date_don', f"Délai non respecté. Prochain don autorisé : {date_minimale}.")
+                form.add_error('date_don',
+                    f"Délai non respecté. Prochain don autorisé : {date_minimale}."
+                )
                 return render(request, 'dons/enregistrer.html', {
-                    'form': form,
-                    'donneur': donneur,
-                    'today': today,
+                    'form': form, 'donneur': donneur, 'today': today,
+                    'prochain_don': donneur.get_prochain_don(),
                 })
 
         don = form.save(commit=False)
@@ -72,8 +66,13 @@ def enregistrer_don(request):
 @donneur_required
 def historique_dons(request):
     donneur = request.user.donneur
-    dons = donneur.dons.all().order_by('-date_don')
+    dons = donneur.dons.select_related('hopital').order_by('-date_don')
 
-    return render(request, 'dons/historique.html', {
-        'dons': dons
-    })    
+    context = {
+        'dons': dons,
+        'total': dons.count(),
+        'prochain_don': donneur.get_prochain_don(),
+        'eligible': donneur.est_eligible(),
+        'delai': donneur.get_delai_don(),
+    }
+    return render(request, 'dons/historique.html', context)    

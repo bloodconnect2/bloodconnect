@@ -23,10 +23,10 @@
         <button type="submit" class="btn btn-danger w-100">Se connecter</button>
       </form>
       <hr>
-      <p class="text-center small">
-        Pas encore de compte ?
-        <a href="{% url 'inscription_donneur' %}">Donneur</a> |
-        <a href="{% url 'inscription_hopital' %}">Hôpital</a>
+      <p class="text-center small mt-2">
+      <a href="{% url 'password_reset' %}" class="text-danger">
+      <i class="bi bi-key"></i> Mot de passe oublié ?
+      </a>
       </p>
     </div>
   </div>

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from core.models import DemandeUrgente, ReponseAppel, BLOOD_COMPATIBILITY
 from core.forms.demande_forms import DemandeUrgenteForm
 from core.decorators import hopital_required, donneur_required
-
+from django.core.paginator import Paginator
 
 def liste_demandes(request):
     groupe = request.GET.get('groupe', '')
@@ -21,8 +21,13 @@ def liste_demandes(request):
     if ville:
         demandes = demandes.filter(hopital__ville__icontains=ville)
 
+    paginator = Paginator(demandes, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'demandes': demandes,
+        'demandes': page_obj,
+        'page_obj': page_obj,
         'groupe_filtre': groupe,
         'ville_filtre': ville,
         'groupes': ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],

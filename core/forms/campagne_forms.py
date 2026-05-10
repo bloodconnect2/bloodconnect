@@ -2,7 +2,6 @@ from django import forms
 from django.utils import timezone
 from core.models import Campagne, Inscription, BLOOD_GROUPS
 
-
 class CampagneForm(forms.ModelForm):
     groupes_cibles = forms.MultipleChoiceField(
         choices=BLOOD_GROUPS,
@@ -20,9 +19,10 @@ class CampagneForm(forms.ModelForm):
     def clean_date(self):
         date = self.cleaned_data.get('date')
         if date and date < timezone.now().date():
-            raise forms.ValidationError("La date de la campagne ne peut pas être dans le passé.")
+            raise forms.ValidationError(
+                f"La date de la campagne ne peut pas être dans le passé. Date minimale : {timezone.now().date()}"
+            )
         return date
-
 
 class InscriptionForm(forms.ModelForm):
     class Meta:

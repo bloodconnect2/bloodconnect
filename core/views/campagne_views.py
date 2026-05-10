@@ -4,6 +4,7 @@ from django.utils import timezone
 from core.models import Campagne, Inscription
 from core.forms.campagne_forms import CampagneForm, InscriptionForm
 from core.decorators import hopital_required, donneur_required
+from django.core.paginator import Paginator
 
 
 def liste_campagnes(request):
@@ -11,7 +12,14 @@ def liste_campagnes(request):
         date__gte=timezone.now().date()
     ).select_related('hopital').order_by('date')
 
-    return render(request, 'campagnes/liste.html', {'campagnes': campagnes})
+    paginator = Paginator(campagnes, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'campagnes/liste.html', {
+        'campagnes': page_obj,
+        'page_obj': page_obj,
+    })
 
 
 def detail_campagne(request, pk):
